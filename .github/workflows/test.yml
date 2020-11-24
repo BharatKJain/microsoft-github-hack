@@ -23,6 +23,20 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Testing
+    - uses: actions/checkout@master
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'src/Contoso.WebApi/**'
+          frontend:
+            - 'src/Contoso.Web/**'
+    - name: backend tests
+      if: steps.filter.outputs.backend == 'true'
       run: |
-        echo "helloworld"
+        echo "Backend Has Changes"
+    - name: frontend tests
+      if: steps.filter.outputs.frontend == 'true'
+      run: |
+        echo "Frontend Has Changes"
