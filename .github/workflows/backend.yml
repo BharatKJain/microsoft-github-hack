@@ -1,4 +1,4 @@
-name: Deploy ASP.NET MVC App deploy to Azure Web App
+name: Deploy Backend -> Contoso.WebApi and Contoso.FunctionApp
 
 on:
   push:
@@ -20,7 +20,25 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
 
 jobs:
-  build-and-deploy:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend-webapi: ${{ steps.filter.outputs.backend-webapi }}
+      backend-functionapp: ${{ steps.filter.outputs.backend-functionapp })
+    steps:
+    - uses: actions/checkout@master
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backend-webapi:
+            - 'src/Contoso.WebApi/**'
+          backend-functionapp:
+            - 'src/Contoso.FunctionApp/**'
+
+  build-and-deploy-WebApi:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend-webapi == 'true' }}
     runs-on: ubuntu-latest
     steps:
 
@@ -62,51 +80,9 @@ jobs:
       run: |
         az logout
   
-  # build-and-deploy-frontend:
-
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-  #   # checkout the repo
-  #   - uses: actions/checkout@master
-  #   - uses: azure/login@v1
-  #     with:
-  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-  #   - name: Setup__.net__core
-  #     uses: actions/setup-dotnet@v1
-  #     with:
-  #       dotnet-version: ${{ env.DOTNET_VERSION }} 
-
-  #   - name: Print working directory
-  #     run: |
-  #       pwd
-      
-  #   # Run dotnet build and publish
-  #   - name: dotnet build and publish
-  #     run: |
-  #       dotnet restore
-  #       dotnet build --configuration Release
-  #       dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-  #     working-directory: ${{ env.working-directory-frontend }}
-    
-  #   #If success then deploy condition here
-       
-  #   - name: 'Run Azure webapp deploy action using publish profile credentials'
-  #     uses: azure/webapps-deploy@v2
-  #     with: 
-  #       app-name: ${{ env.AZURE_WEBAPP_FRONTEND}} # Replace with your app name
-  #       publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND  }} # Define secret variable in repository settings as per action documentation
-  #       package: '${{ env.working-directory-frontend}}'
-    
-  #   #If failure raise issue
-  
-  #   - name: logout
-  #     run: |
-  #       az logout
-  
   build-and-deploy-function-app:
-
+    needs: changes
+    if: ${{ needs.changes.outputs.backend-functionapp == 'true' }}
     runs-on: windows-latest
     steps:
     - name: 'Checkout GitHub Action'
