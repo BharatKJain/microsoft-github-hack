@@ -11,11 +11,11 @@ env:
   AZURE_WEBAPP_NAME: contoso-api    # set this to your application's name
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '2.2.402' 
-  working-directory: ./src/Contoso.WebApi        # set this to the dot net version to use
+  # working-directory: ./src/Contoso.WebApi        # set this to the dot net version to use
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
 
     # checkout the repo
@@ -28,6 +28,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }} 
+    - name: Print working directory
+      run: |
+        echo $pwd
       
     # Run dotnet build and publish
     - name: dotnet build and publish
