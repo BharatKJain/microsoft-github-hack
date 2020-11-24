@@ -26,6 +26,7 @@ jobs:
       backendwebapi: ${{ steps.filter.outputs.backendwebapi }}
       backendfunctionapp: ${{ steps.filter.outputs.backendfunctionapp }}
     steps:
+    - uses: actions/checkout@master
     - uses: dorny/paths-filter@v2
       id: filter
       with:
