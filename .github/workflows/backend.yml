@@ -23,22 +23,22 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      backend-webapi: ${{ steps.filter.outputs.backend-webapi }}
-      backend-functionapp: ${{ steps.filter.outputs.backend-functionapp })
+      backendwebapi: ${{ steps.filter.outputs.backendwebapi }}
+      backendfunctionapp: ${{ steps.filter.outputs.backendfunctionapp })
     steps:
     - uses: actions/checkout@master
     - uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          backend-webapi:
+          backendwebapi:
             - 'src/Contoso.WebApi/**'
-          backend-functionapp:
+          backendfunctionapp:
             - 'src/Contoso.FunctionApp/**'
 
   build-and-deploy-WebApi:
     needs: changes
-    if: ${{ needs.changes.outputs.backend-webapi == 'true' }}
+    if: ${{ needs.changes.outputs.backendwebapi == 'true' }}
     runs-on: ubuntu-latest
     steps:
 
@@ -82,7 +82,7 @@ jobs:
   
   build-and-deploy-function-app:
     needs: changes
-    if: ${{ needs.changes.outputs.backend-functionapp == 'true' }}
+    if: ${{ needs.changes.outputs.backendfunctionapp == 'true' }}
     runs-on: windows-latest
     steps:
     - name: 'Checkout GitHub Action'
