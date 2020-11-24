@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backendwebapi: ${{ steps.filter.outputs.backendwebapi }}
-      backendfunctionapp: ${{ steps.filter.outputs.backendfunctionapp })
+      backendfunctionapp: ${{ steps.filter.outputs.backendfunctionapp }}
     steps:
     - uses: actions/checkout@master
     - uses: dorny/paths-filter@v2
