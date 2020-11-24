@@ -1,0 +1,74 @@
+name: Deploy ASP.NET MVC App deploy to Azure Web App
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env:
+  AZURE_WEBAPP_FRONTEND: 'contoso-webapp'
+  AZURE_WEBAPP_NAME: 'contoso-api'    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '3.1' 
+  working-directory: ./src/Contoso.WebApi        # set this to the dot net version to use
+  working-directory-frontend: ./src/Contoso.Web
+  working-directory-functionapp: ./src/Contoso.FunctionApp
+  ERROR_FLAG: false
+  AZURE_FUNCTIONAPP_NAME: 'contoso-function' # set this to your application's name
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          frontend:
+            - 'src/Contoso.Web/**'
+  frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Setup__.net__core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+    - name: Print working directory
+      run: |
+        pwd
+      
+    # Run dotnet build and publish
+    - name: dotnet build and publish
+      run: |
+        dotnet restore
+        dotnet build --configuration Release
+        dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+      working-directory: ${{ env.working-directory-frontend }}
+    
+    #If success then deploy condition here
+       
+    - name: 'Run Azure webapp deploy action using publish profile credentials'
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: ${{ env.AZURE_WEBAPP_FRONTEND}} # Replace with your app name
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND  }} # Define secret variable in repository settings as per action documentation
+        package: '${{ env.working-directory-frontend}}'
+    
+    #If failure raise issue
+  
+    - name: logout
+      run: |
+        az logout
