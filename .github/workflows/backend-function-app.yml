@@ -1,0 +1,74 @@
+name: Deploy Backend ->  Contoso.FunctionApp
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env:
+  AZURE_WEBAPP_FRONTEND: 'contoso-webapp'
+  AZURE_WEBAPP_NAME: 'contoso-api'    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '3.1' 
+  working-directory: ./src/Contoso.WebApi        # set this to the dot net version to use
+  working-directory-frontend: ./src/Contoso.Web
+  working-directory-functionapp: ./src/Contoso.FunctionApp
+  ERROR_FLAG_WEBAPI: 'true'
+  ERROR_FLAG_FUNCTIONAPP: 'true'
+  AZURE_FUNCTIONAPP_NAME: 'contoso-function' # set this to your application's name
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backendfunctionapp: ${{ steps.filter.outputs.backendfunctionapp }}
+    steps:
+    - uses: actions/checkout@master
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backendfunctionapp:
+            - 'src/Contoso.FunctionApp/**'
+  
+  build-and-deploy-function-app:
+    needs: changes
+    if: ${{ needs.changes.outputs.backendfunctionapp == 'true' }}
+    runs-on: windows-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+
+    - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 'Resolve Project Dependencies Using Dotnet'
+      shell: pwsh
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        dotnet build --configuration Release --output ./output
+        popd
+      working-directory: ${{ env.working-directory-functionapp }}
+    - name: 'Run Azure Functions Action'
+      uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: '${{ env.working-directory-functionapp }}/output'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+    - name: Checking ERROR in job
+      if: ${{ cancelled() }}
+      uses: JasonEtco/create-an-issue@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_COMMIT_SHA: ${{ github.sha }}
+        GITHUB_OWNER: 'BharatKJain'
+        GITHUB_REPOSITORY: 'microsoft-github-hack'
+        GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
+        GITHUB_ISSUE_BODY: 'Please check'

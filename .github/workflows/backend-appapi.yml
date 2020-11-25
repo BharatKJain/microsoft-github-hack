@@ -1,4 +1,4 @@
-name: Deploy Backend -> Contoso.WebApi and Contoso.FunctionApp
+name: Deploy Backend -> Contoso.WebApi 
 
 on:
   push:
@@ -94,48 +94,18 @@ jobs:
         GITHUB_REPOSITORY: 'microsoft-github-hack'
         GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
         GITHUB_ISSUE_BODY: 'Please check'
-  
-  build-and-deploy-function-app:
-    needs: changes
-    if: ${{ needs.changes.outputs.backendfunctionapp == 'true' }}
-    runs-on: windows-latest
-    steps:
-    - name: 'Checkout GitHub Action'
-      uses: actions/checkout@master
 
-    - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: 'Resolve Project Dependencies Using Dotnet'
-      shell: pwsh
-      run: |
-        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        dotnet build --configuration Release --output ./output
-        popd
-      working-directory: ${{ env.working-directory-functionapp }}
-    - name: 'Run Azure Functions Action'
-      uses: Azure/functions-action@v1
-      id: fa
-      with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: '${{ env.working-directory-functionapp }}/output'
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-
-    - name: divide error
-      run: exit 404
-
-    - name: Checking ERROR in job
-      if: ${{ cancelled() }}
-      uses: JasonEtco/create-an-issue@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_COMMIT_SHA: ${{ github.sha }}
-        GITHUB_OWNER: 'BharatKJain'
-        GITHUB_REPOSITORY: 'microsoft-github-hack'
-        GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
-        GITHUB_ISSUE_BODY: 'Please check'
+  # pull-request-creation:
+  #   needs: build-and-deploy-WebApi
+  #   steps:
+  #   - name: Update npm packages
+  #     uses: technote-space/create-pr-action@v2
+  #     with:
+  #       COMMIT_MESSAGE: 'chore: testing'
+  #       COMMIT_NAME: 'GitHub Actions'
+  #       COMMIT_EMAIL: 'bharat.mayoor77@gmail.com'
+  #       PR_BRANCH_NAME: 'chore-update-${PR_ID}'
+  #       PR_TITLE: 'chore: update dependencies'
   
   # issue-creation:
   #   needs: [build-and-deploy-function-app,build-and-deploy-WebApi]
