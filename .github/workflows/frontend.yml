@@ -1,4 +1,4 @@
-name: Deploy FrontEnd -> Contoso.Web
+name: Deploy FrontEnd -> Contoso.WebApp
 
 on:
   push:

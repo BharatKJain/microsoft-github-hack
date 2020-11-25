@@ -62,13 +62,13 @@ jobs:
         package: '${{ env.working-directory-functionapp }}/output'
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
-    - name: Checking ERROR in job
-      if: ${{ cancelled() }}
-      uses: JasonEtco/create-an-issue@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_COMMIT_SHA: ${{ github.sha }}
-        GITHUB_OWNER: 'BharatKJain'
-        GITHUB_REPOSITORY: 'microsoft-github-hack'
-        GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
-        GITHUB_ISSUE_BODY: 'Please check'
+    # - name: Checking ERROR in job
+    #   if: ${{ cancelled() }}
+    #   uses: JasonEtco/create-an-issue@v2
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     GITHUB_COMMIT_SHA: ${{ github.sha }}
+    #     GITHUB_OWNER: 'BharatKJain'
+    #     GITHUB_REPOSITORY: 'microsoft-github-hack'
+    #     GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
+    #     GITHUB_ISSUE_BODY: 'Please check'

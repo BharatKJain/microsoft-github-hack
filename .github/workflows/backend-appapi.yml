@@ -81,19 +81,16 @@ jobs:
       run: |
         az logout
 
-    - name: divide error
-      run: exit 204
-
-    - name: Checking ERRORS in job
-      if: ${{ cancelled() }}
-      uses: JasonEtco/create-an-issue@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_COMMIT_SHA: ${{ github.sha }}
-        GITHUB_OWNER: 'BharatKJain'
-        GITHUB_REPOSITORY: 'microsoft-github-hack'
-        GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
-        GITHUB_ISSUE_BODY: 'Please check'
+    # - name: Checking ERRORS in job
+    #   if: ${{ cancelled() }}
+    #   uses: JasonEtco/create-an-issue@v2
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     GITHUB_COMMIT_SHA: ${{ github.sha }}
+    #     GITHUB_OWNER: 'BharatKJain'
+    #     GITHUB_REPOSITORY: 'microsoft-github-hack'
+    #     GITHUB_ISSUE_TITLE: 'Facing issue with Divide Error'
+    #     GITHUB_ISSUE_BODY: 'Please check'
 
   # pull-request-creation:
   #   needs: build-and-deploy-WebApi
