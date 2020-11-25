@@ -80,9 +80,9 @@ jobs:
     - name: logout
       run: |
         az logout
-        
+
     - name: divide error
-      run: echo ${1/0}
+      run: exit 204
 
     - name: Checking ERRORS in job
       if: ${{ cancelled() }}
@@ -124,7 +124,7 @@ jobs:
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
     - name: divide error
-      run: echo ${1/0}
+      run: exit 404
 
     - name: Checking ERROR in job
       if: ${{ cancelled() }}
